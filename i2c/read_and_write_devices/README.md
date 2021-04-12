@@ -3,8 +3,9 @@
 A test case for
 [this pico-sdk issue](https://github.com/raspberrypi/pico-sdk/issues/278).
 
-The goal of this program is to see if it can detect any errors when writing to
-and reading from devices on the I2C bus. Ideally, there should be no errors.
+The goal of this program is to see if it can detect any errors when
+continuously writing to and reading from devices on the I2C bus.
+Ideally, there should be no errors.
 
 The program performs tests at I2C baudrates of 1000 to 2048000 in steps of
 1000 baud.

@@ -4,8 +4,8 @@ A test case for
 [this pico-sdk issue](https://github.com/raspberrypi/pico-sdk/issues/278).
 
 The goal of this program is to see if it can detect anything unexpected when
-scanning the I2C bus with `i2c_write_blocking`. Ideally, there should be no
-errors.
+continuously scanning the I2C bus with `i2c_write_blocking`. Ideally, there
+should be no errors.
 
 The program performs tests at I2C baudrates of 1000 to 2048000 in steps of
 1000 baud.
@@ -15,7 +15,7 @@ I2C bus, this program should output the information shown below when the issue
 is fixed.
 
 **Important**: If other devices are on the I2C bus, the array `DEVICE_ADDRS`
-at the top of `send_at_many_baudrates.c` will need to be changed accordingly.
+at the top of `scan_at_many_baudrates.c` will need to be changed accordingly.
 
 ```
 1 byte write to all addresses at increasing baudrates
