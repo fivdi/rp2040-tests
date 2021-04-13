@@ -11,7 +11,6 @@ I2C bus, this program should output the information shown below.
 at the top of `scan_with_read_at_100k.c` will need to be changed accordingly.
 
 ```
-1 byte write to all addresses at increasing baudrates
 100 scans, 0 errors
 200 scans, 0 errors
 300 scans, 0 errors
