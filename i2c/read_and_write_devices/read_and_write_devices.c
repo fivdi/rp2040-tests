@@ -2,8 +2,8 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
-static const uint MIN_BAUDRATE = 1000;
-static const uint MAX_BAUDRATE = 2048000;
+static const uint MIN_BAUDRATE = 2000;
+static const uint MAX_BAUDRATE = 2000000;
 
 static const uint BAUDRATE_INC = 1000;
 
@@ -100,7 +100,7 @@ static uint mcp9808(i2c_inst_t *i2c) {
 }
 
 int main() {
-    sleep_ms(300); // Give the mcp9808 time to so it's first reading.
+    sleep_ms(300); // Give the mcp9808 time to do it's first reading.
 
     stdio_init_all();
 
@@ -112,33 +112,48 @@ int main() {
     uint total_error_count = 0;
     uint total_scan_count = 0;
 
+    uint max_baudrate = MIN_BAUDRATE +
+        ((MAX_BAUDRATE - MIN_BAUDRATE) / BAUDRATE_INC) * BAUDRATE_INC;
+
     while (true) {
         printf("\n\nread and write devices at increasing baudrates");
 
+        uint line_error_count = 0;
+        uint line_scan_count = 0;
+
+        // Scan bus at all baudrates from MIN_BAUDRATE to max_baudrate in
+        // in increments of BAUDRATE_INC.
         for (
-            uint baudrate = MIN_BAUDRATE, line_error_count = 0;
-            baudrate <= MAX_BAUDRATE;
-            baudrate += BAUDRATE_INC, ++total_scan_count
+            uint baudrate = MIN_BAUDRATE;
+            baudrate <= max_baudrate;
+            baudrate += BAUDRATE_INC
         ) {
-            if (total_scan_count % SCANS_PER_LINE == 0) {
-                printf(
-                    "\nbaudrates %d to %d ",
-                    baudrate,
-                    baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1))
+            // Print baudrates at the start of a line.
+            if (line_scan_count % SCANS_PER_LINE == 0) {
+                uint max_baudrate_line = MIN(
+                    baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)), max_baudrate
                 );
+
+                printf("\nbaudrates %d to %d ", baudrate, max_baudrate_line);
             }
 
             i2c_init(i2c_default, baudrate);
 
             uint error_count = mcp9808(i2c_default);
-            total_error_count += error_count;
-            line_error_count += error_count;
-
             printf(".");
 
-            if (total_scan_count % SCANS_PER_LINE == (SCANS_PER_LINE - 1)) {
-                printf(" %d errors", line_error_count);
+            line_error_count += error_count;
+            line_scan_count += 1;
+
+            total_error_count += error_count;
+            total_scan_count += 1;
+
+            // Print error information at the end of a line TODO MAX_BAUDRATE
+            if (line_scan_count == SCANS_PER_LINE || baudrate == MAX_BAUDRATE) {
+                printf(" %d of %d errors", line_error_count, total_error_count);
+
                 line_error_count = 0;
+                line_scan_count = 0;
             }
         }
 

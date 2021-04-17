@@ -11,6 +11,10 @@ add_executable(bus_scan_issue_278
     bus_scan_issue_278.c
 )
 
+target_compile_definitions(bus_scan_issue_278 PRIVATE
+  PARAM_ASSERTIONS_ENABLED_I2C=1
+)
+
 pico_enable_stdio_usb(bus_scan_issue_278 0)
 pico_enable_stdio_uart(bus_scan_issue_278 1)
 

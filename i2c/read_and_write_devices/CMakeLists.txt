@@ -11,6 +11,10 @@ add_executable(read_and_write_devices
     read_and_write_devices.c
 )
 
+target_compile_definitions(read_and_write_devices PRIVATE
+  PARAM_ASSERTIONS_ENABLED_I2C=1
+)
+
 pico_enable_stdio_usb(read_and_write_devices 0)
 pico_enable_stdio_uart(read_and_write_devices 1)
 

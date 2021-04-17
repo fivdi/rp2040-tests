@@ -11,6 +11,10 @@ add_executable(scan_with_read_at_100k
     scan_with_read_at_100k.c
 )
 
+target_compile_definitions(scan_with_read_at_100k PRIVATE
+  PARAM_ASSERTIONS_ENABLED_I2C=1
+)
+
 pico_enable_stdio_usb(scan_with_read_at_100k 0)
 pico_enable_stdio_uart(scan_with_read_at_100k 1)
 

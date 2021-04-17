@@ -11,6 +11,10 @@ add_executable(scan_at_many_baudrates
     scan_at_many_baudrates.c
 )
 
+target_compile_definitions(scan_at_many_baudrates PRIVATE
+  PARAM_ASSERTIONS_ENABLED_I2C=1
+)
+
 pico_enable_stdio_usb(scan_at_many_baudrates 0)
 pico_enable_stdio_uart(scan_at_many_baudrates 1)
 

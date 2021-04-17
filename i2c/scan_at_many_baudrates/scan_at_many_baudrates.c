@@ -15,8 +15,8 @@ static const uint DEVICE_COUNT = sizeof(DEVICE_ADDRS) / sizeof(uint8_t);
 static const uint8_t MIN_I2C_ADDR = 0x08;
 static const uint8_t MAX_I2C_ADDR = 0x77;
 
-static const uint MIN_BAUDRATE = 1000;
-static const uint MAX_BAUDRATE = 2048000;
+static const uint MIN_BAUDRATE = 2000;
+static const uint MAX_BAUDRATE = 2000000;
 
 static const uint BAUDRATE_INC = 1000;
 
@@ -84,6 +84,9 @@ int main() {
     uint total_error_count = 0;
     uint total_scan_count = 0;
 
+    uint max_baudrate = MIN_BAUDRATE +
+        ((MAX_BAUDRATE - MIN_BAUDRATE) / BAUDRATE_INC) * BAUDRATE_INC;
+
     uint8_t tx_buf[MAX_TX_LEN];
     for (size_t i = 0; i < MAX_TX_LEN; ++i) {
         tx_buf[i] = i;
@@ -96,31 +99,42 @@ int main() {
                tx_len
             );
 
+            uint line_error_count = 0;
+            uint line_scan_count = 0;
+
             for (
-                uint baudrate = MIN_BAUDRATE, line_error_count = 0;
-                baudrate <= MAX_BAUDRATE;
-                baudrate += BAUDRATE_INC, ++total_scan_count
+                uint baudrate = MIN_BAUDRATE;
+                baudrate <= max_baudrate;
+                baudrate += BAUDRATE_INC
             ) {
-                if (total_scan_count % SCANS_PER_LINE == 0) {
+                // Print baudrates at the start of a line.
+                if (line_scan_count % SCANS_PER_LINE == 0) {
+                    uint max_baudrate_line = MIN(
+                        baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)), max_baudrate
+                    );
+
                     printf(
-                        "\nbaudrates %d to %d ",
-                        baudrate,
-                        baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1))
+                        "\nbaudrates %d to %d ", baudrate, max_baudrate_line
                     );
                 }
 
                 uint error_count = write_to_all_addresses(
                     i2c_default, baudrate, tx_buf, tx_len
                 );
-
-                total_error_count += error_count;
-                line_error_count += error_count;
-
                 printf(".");
 
-                if (total_scan_count % SCANS_PER_LINE == (SCANS_PER_LINE - 1)) {
-                    printf(" %d errors", line_error_count);
+                line_error_count += error_count;
+                line_scan_count += 1;
+
+                total_error_count += error_count;
+                total_scan_count += 1;
+
+                // Print error information at the end of a line
+                if (line_scan_count == SCANS_PER_LINE || baudrate == max_baudrate) {
+                    printf(" %d of %d errors", line_error_count, total_error_count);
+
                     line_error_count = 0;
+                    line_scan_count = 0;
                 }
             }
 
