@@ -12,7 +12,25 @@ static const uint SCANS_PER_LINE = 32;
 static const uint SUCCESS = 0;
 static const uint ERROR = -1;
 
-static uint read_word(i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t *word) {
+static uint read_byte(
+    i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint8_t *byte
+) {
+    int rval = i2c_write_blocking(i2c, addr, &reg, 1, true);
+    if (rval != 1) {
+        return ERROR;
+    }
+
+    rval = i2c_read_blocking(i2c, addr, (uint8_t *) byte, 1, false);
+    if (rval != 1) {
+        return ERROR;
+    }
+
+    return SUCCESS;
+}
+
+static uint read_word(
+    i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t *word
+) {
     int rval = i2c_write_blocking(i2c, addr, &reg, 1, true);
     if (rval != 1) {
         return ERROR;
@@ -26,7 +44,9 @@ static uint read_word(i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t *word
     return SUCCESS;
 }
 
-static uint write_word(i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t word) {
+static uint write_word(
+    i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t word
+) {
     uint8_t tx_data[] = {reg, (word >> 8) & 0xff, word & 0xff};
 
     int rval = i2c_write_blocking(i2c, addr, tx_data, 3, false);
@@ -37,7 +57,7 @@ static uint write_word(i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t word
     return SUCCESS;
 }
 
-static uint mcp9808(i2c_inst_t *i2c) {
+static uint access_mcp9808(i2c_inst_t *i2c) {
     const uint8_t MCP9808_ADDR = 0x18;
     const uint8_t CRITICAL_TEMP_REG = 0x04;
     const uint8_t TEMP_REG = 0x05;
@@ -47,6 +67,7 @@ static uint mcp9808(i2c_inst_t *i2c) {
     // Read the temperature a few times and make sure it looks reasonable.
     for (int i = 1; i <= 5; ++i) {
         uint16_t raw_temp;
+
         if (read_word(i2c, MCP9808_ADDR, TEMP_REG, &raw_temp) == ERROR) {
             ++error_count;
         } else {
@@ -87,12 +108,53 @@ static uint mcp9808(i2c_inst_t *i2c) {
             if (rval == ERROR) {
                 ++error_count;
             } else {
-                crit_temp_read = crit_temp_read << 8 | ((crit_temp_read >> 8) & 0xff);
+                crit_temp_read =
+                    crit_temp_read << 8 | ((crit_temp_read >> 8) & 0xff);
 
                 if (crit_temp_read != crit_temp_written) {
                     ++error_count;
                 }
             }
+        }
+    }
+
+    return error_count;
+}
+
+static uint access_bme280(i2c_inst_t *i2c) {
+    const uint8_t BME280_ADDR = 0x76;
+    const uint8_t ID_REG = 0xd0;
+
+    uint error_count = 0;
+
+    // Read the ID a few times and make sure it's correct
+    for (int i = 1; i <= 5; ++i) {
+        uint8_t id;
+
+        if (read_byte(i2c, BME280_ADDR, ID_REG, &id) == ERROR) {
+            ++error_count;
+        } else if (id != 0x60) {
+            ++error_count;
+        }
+    }
+
+    return error_count;
+}
+
+static uint access_tsc34725(i2c_inst_t *i2c) {
+    const uint8_t TSC34725_ADDR = 0x29;
+    const uint8_t ID_REG = 0x92;
+
+    uint error_count = 0;
+
+    // Read the ID a few times and make sure it's correct
+    for (int i = 1; i <= 5; ++i) {
+        uint8_t id;
+
+        if (read_byte(i2c, TSC34725_ADDR, ID_REG, &id) == ERROR) {
+            ++error_count;
+        } else if (id != 0x44) {
+            ++error_count;
         }
     }
 
@@ -131,7 +193,8 @@ int main() {
             // Print baudrates at the start of a line.
             if (line_scan_count % SCANS_PER_LINE == 0) {
                 uint max_baudrate_line = MIN(
-                    baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)), max_baudrate
+                    baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)),
+                    max_baudrate
                 );
 
                 printf("\nbaudrates %d to %d ", baudrate, max_baudrate_line);
@@ -139,7 +202,9 @@ int main() {
 
             i2c_init(i2c_default, baudrate);
 
-            uint error_count = mcp9808(i2c_default);
+            uint error_count = access_mcp9808(i2c_default);
+            error_count += access_bme280(i2c_default);
+            error_count += access_tsc34725(i2c_default);
             printf(".");
 
             line_error_count += error_count;
@@ -148,9 +213,13 @@ int main() {
             total_error_count += error_count;
             total_scan_count += 1;
 
-            // Print error information at the end of a line TODO MAX_BAUDRATE
-            if (line_scan_count == SCANS_PER_LINE || baudrate == MAX_BAUDRATE) {
-                printf(" %d of %d errors", line_error_count, total_error_count);
+            // Print error information at the end of a line
+            if (line_scan_count == SCANS_PER_LINE ||
+                baudrate == max_baudrate
+            ) {
+                printf(
+                    " %d of %d errors", line_error_count, total_error_count
+                );
 
                 line_error_count = 0;
                 line_scan_count = 0;

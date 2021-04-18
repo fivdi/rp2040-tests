@@ -110,7 +110,8 @@ int main() {
                 // Print baudrates at the start of a line.
                 if (line_scan_count % SCANS_PER_LINE == 0) {
                     uint max_baudrate_line = MIN(
-                        baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)), max_baudrate
+                        baudrate + (BAUDRATE_INC * (SCANS_PER_LINE - 1)),
+                        max_baudrate
                     );
 
                     printf(
@@ -130,8 +131,13 @@ int main() {
                 total_scan_count += 1;
 
                 // Print error information at the end of a line
-                if (line_scan_count == SCANS_PER_LINE || baudrate == max_baudrate) {
-                    printf(" %d of %d errors", line_error_count, total_error_count);
+                if (line_scan_count == SCANS_PER_LINE ||
+                    baudrate == max_baudrate
+                ) {
+                    printf(
+                        " %d of %d errors",
+                        line_error_count, total_error_count
+                    );
 
                     line_error_count = 0;
                     line_scan_count = 0;
