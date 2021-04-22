@@ -6,7 +6,7 @@ program does this continuously and as fast as it can. The idea is to see how
 many bits of data are transfered over the wire per second at 400 kHz.
 
 Each time the CHIP_ID register is read, 39 bits of data are transfered and it
-look something like this:
+looks something like this:
 
 ```
 S Addr Wr [A] Comm [A] S Addr Rd [A] [Data] NA P
