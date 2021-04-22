@@ -15,8 +15,8 @@ S Addr Wr [A] Comm [A] S Addr Rd [A] [Data] NA P
 It turns out that the CHIP_ID register can be read 1136 times per second. This
 implies that 39 * 1136 = 44304 bits of data are transfered per second. This is
 far less that the theoretical maximum of 400000 bits per second and is related
-to the BNO055 stretching the I2C clock. Other devices like the BME280 are a
-lot faster.
+to the BNO055 stretching the I2C clock. With other devices like the BME280 a
+lot more data can be transferred per second.
 
 The program outputs one line per second and the output looks like this:
 
