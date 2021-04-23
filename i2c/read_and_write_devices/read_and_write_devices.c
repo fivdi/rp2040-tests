@@ -9,10 +9,10 @@ static const uint BAUDRATE_INC = 1000;
 
 static const uint SCANS_PER_LINE = 32;
 
-static const uint SUCCESS = 0;
-static const uint ERROR = -1;
+static const int SUCCESS = 0;
+static const int ERROR = -1;
 
-static uint read_byte(
+static int read_byte(
     i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint8_t *byte
 ) {
     int rval = i2c_write_blocking(i2c, addr, &reg, 1, true);
@@ -28,7 +28,7 @@ static uint read_byte(
     return SUCCESS;
 }
 
-static uint read_word(
+static int read_word(
     i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t *word
 ) {
     int rval = i2c_write_blocking(i2c, addr, &reg, 1, true);
@@ -44,7 +44,7 @@ static uint read_word(
     return SUCCESS;
 }
 
-static uint write_word(
+static int write_word(
     i2c_inst_t *i2c, uint8_t addr, uint8_t reg, uint16_t word
 ) {
     uint8_t tx_data[] = {reg, (word >> 8) & 0xff, word & 0xff};
@@ -92,7 +92,7 @@ static uint access_mcp9808(i2c_inst_t *i2c) {
     for (int i = 1; i <= 5; ++i) {
         uint16_t crit_temp_written = i << 6;
 
-        uint rval = write_word(
+        int rval = write_word(
             i2c, MCP9808_ADDR, CRITICAL_TEMP_REG, crit_temp_written
         );
 
