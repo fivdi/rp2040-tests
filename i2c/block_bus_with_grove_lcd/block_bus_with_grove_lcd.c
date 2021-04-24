@@ -14,7 +14,7 @@ static int print_i2c_bus_status() {
         "\nSDA is %s, SCL is %s, the bus is %s.",
         sdaHigh ? "HIGH" : "LOW",
         sclHigh ? "HIGH" : "LOW",
-        (!sdaHigh || !sclHigh) ? "blocked" : "not blocked"
+        (sdaHigh && sclHigh) ? "not blocked" : "blocked"
     );
 
     return (sdaHigh && sclHigh) ? SUCCESS : ERROR;
