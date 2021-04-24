@@ -141,8 +141,8 @@ static uint access_bme280(i2c_inst_t *i2c) {
     return error_count;
 }
 
-static uint access_tsc34725(i2c_inst_t *i2c) {
-    const uint8_t TSC34725_ADDR = 0x29;
+static uint access_tcs34725(i2c_inst_t *i2c) {
+    const uint8_t TCS34725_ADDR = 0x29;
     const uint8_t ID_REG = 0x92;
 
     uint error_count = 0;
@@ -151,7 +151,7 @@ static uint access_tsc34725(i2c_inst_t *i2c) {
     for (int i = 1; i <= 5; ++i) {
         uint8_t id;
 
-        if (read_byte(i2c, TSC34725_ADDR, ID_REG, &id) == ERROR) {
+        if (read_byte(i2c, TCS34725_ADDR, ID_REG, &id) == ERROR) {
             ++error_count;
         } else if (id != 0x44) {
             ++error_count;
@@ -204,7 +204,7 @@ int main() {
 
             uint error_count = access_mcp9808(i2c_default);
             error_count += access_bme280(i2c_default);
-            error_count += access_tsc34725(i2c_default);
+            error_count += access_tcs34725(i2c_default);
             printf(".");
 
             line_error_count += error_count;

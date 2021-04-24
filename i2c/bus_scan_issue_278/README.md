@@ -6,7 +6,7 @@ A test case for
 The goal of this program is to scan the I2C bus using `i2c_write_blocking`
 rather that `i2c_read_blocking`.
 
-Assuming there is a MCP9808 (0x18), TSC34725 (0x29) and BME280 (0x76) on the
+Assuming there is a MCP9808 (0x18), TCS34725 (0x29) and BME280 (0x76) on the
 I2C bus, this program should output the following when the issue is fixed:
 
 ```

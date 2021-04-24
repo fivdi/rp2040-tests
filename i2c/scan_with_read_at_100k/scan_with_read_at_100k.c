@@ -7,7 +7,7 @@
 // Change if needed.
 static const uint8_t DEVICE_ADDRS[] = {
     0x18, // mcp9808
-    0x29, // tsc34725
+    0x29, // tcs34725
     0x76  // bme280
 };
 static const uint DEVICE_COUNT = sizeof(DEVICE_ADDRS) / sizeof(uint8_t);

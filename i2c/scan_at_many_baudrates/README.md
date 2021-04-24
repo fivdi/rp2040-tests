@@ -10,7 +10,7 @@ should be no errors.
 The program performs tests at I2C baudrates of 2000 to 2000000 in steps of
 1000 baud.
 
-Assuming there is a MCP9808 (0x18), TSC34725 (0x29) and BME280 (0x76) on the
+Assuming there is a MCP9808 (0x18), TCS34725 (0x29) and BME280 (0x76) on the
 I2C bus, this program should output the information shown below when the issue
 is fixed.
 

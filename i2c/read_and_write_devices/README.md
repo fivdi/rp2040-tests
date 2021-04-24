@@ -10,7 +10,7 @@ Ideally, there should be no errors.
 The program performs tests at I2C baudrates of 2000 to 2000000 in steps of
 1000 baud.
 
-This program requires an MCP9808, BME280 and TSC34725 on the I2C bus to
+This program requires an MCP9808, BME280 and TCS34725 on the I2C bus to
 function correctly.
 
 Assuming the required devices are on the I2C bus, this program should output
