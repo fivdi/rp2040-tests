@@ -7,6 +7,9 @@ read.
 If this program is run when the I2C bus is not blocked it will output the
 following:
 
+To function correctly this program need the modifications from
+[this PR](https://github.com/raspberrypi/pico-sdk/pull/331).
+
 ```
 ---------------------------------------------------
 SDA is HIGH, SCL is HIGH, the bus is not blocked.
