@@ -14,7 +14,7 @@ static int get_and_print_bus_status() {
         "\nSDA is %s, SCL is %s, the bus is %s.",
         sda_high ? "HIGH" : "LOW",
         scl_high ? "HIGH" : "LOW",
-        (!sda_high || !scl_high) ? "blocked" : "not blocked"
+        (sda_high && scl_high) ? "not blocked" : "blocked"
     );
 
     return (sda_high && scl_high) ? BUS_NOT_BLOCKED : BUS_BLOCKED;
