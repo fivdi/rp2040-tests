@@ -39,6 +39,9 @@ int main() {
 
     i2c_init(i2c_default, 400 * 1000);
 
+    // Power-on-reset time for the BNO055 is 650 ms. Give it time to start.
+    sleep_ms(650);
+
     printf("\nContinuously verify that the chip ID of a BNO055 is 0x0a");
 
     uint error_count = 0;
