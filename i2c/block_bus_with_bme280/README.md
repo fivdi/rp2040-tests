@@ -4,11 +4,11 @@ This program demonstrates how a BME280 will block the I2C bus by holding SDA
 low if the I2C clock is stopped at the appropriate point in time during an I2C
 read.
 
-If this program is run when the I2C bus is not blocked it will output the
-following:
-
 To function correctly this program need the modifications from
 [this PR](https://github.com/raspberrypi/pico-sdk/pull/331).
+
+If this program is run when the I2C bus is not blocked it will output the
+following:
 
 ```
 ---------------------------------------------------
