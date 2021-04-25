@@ -65,7 +65,7 @@ static void block_bus_with_bme280() {
                 // As soon as a Data bit (bits 11 through 18) with value 0 is
                 // received, reset the I2C peripheral. This results in the I2C
                 // clock being stopped and SCL remains high. It also results
-                // in SDA remaining low blocking the I2C bus.
+                // in SDA being held low by the BME280 blocking the I2C bus.
                 if (bit_count >= 11 && bit == 0) {
                     reset_block(RESETS_RESET_I2C0_BITS);
                     printf("\nBus should now be blocked.");
