@@ -3,21 +3,21 @@
 #include "hardware/i2c.h"
 #include "hardware/resets.h"
 
-static const int SUCCESS = 0;
-static const int ERROR = -1;
+static const int BUS_NOT_BLOCKED = 0;
+static const int BUS_BLOCKED = -1;
 
-static int print_i2c_bus_status() {
-    bool sdaHigh = gpio_get(PICO_DEFAULT_I2C_SDA_PIN);
-    bool sclHigh = gpio_get(PICO_DEFAULT_I2C_SCL_PIN);
+static int get_and_print_bus_status() {
+    bool sda_high = gpio_get(PICO_DEFAULT_I2C_SDA_PIN);
+    bool scl_high = gpio_get(PICO_DEFAULT_I2C_SCL_PIN);
 
     printf(
         "\nSDA is %s, SCL is %s, the bus is %s.",
-        sdaHigh ? "HIGH" : "LOW",
-        sclHigh ? "HIGH" : "LOW",
-        (sdaHigh && sclHigh) ? "not blocked" : "blocked"
+        sda_high ? "HIGH" : "LOW",
+        scl_high ? "HIGH" : "LOW",
+        (sda_high && scl_high) ? "not blocked" : "blocked"
     );
 
-    return (sdaHigh && sclHigh) ? SUCCESS : ERROR;
+    return (sda_high && scl_high) ? BUS_NOT_BLOCKED : BUS_BLOCKED;
 }
 
 static void block_bus_with_grove_lcd() {
@@ -31,11 +31,11 @@ static void block_bus_with_grove_lcd() {
     i2c_default->hw->data_cmd =
         1 << I2C_IC_DATA_CMD_RESTART_LSB |
         1 << I2C_IC_DATA_CMD_STOP_LSB |
-        1 << I2C_IC_DATA_CMD_CMD_LSB; // -> 1 for read
+        1 << I2C_IC_DATA_CMD_CMD_LSB;
 
     while (!i2c_get_read_available(i2c_default)) {
         sleep_ms(1000);
-        print_i2c_bus_status();
+        get_and_print_bus_status();
     }
 }
 
@@ -49,11 +49,12 @@ int main() {
     gpio_pull_up(PICO_DEFAULT_I2C_SCL_PIN);
 
     printf("\n---------------------------------------------------");
-    if (print_i2c_bus_status() == ERROR) {
+    if (get_and_print_bus_status() == BUS_BLOCKED) {
         printf("\nManually power Pico off and back on to unblock bus.");
     } else {
         printf("\nWill now read one byte from LCD to block bus.");
         block_bus_with_grove_lcd();
+        printf("\nError: attempt to block bus failed.");
     }
 }
 
